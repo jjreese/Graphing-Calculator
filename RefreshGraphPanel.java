@@ -101,7 +101,7 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 			}
 		}
 		
-		// TODO : draw points, connect the dots
+		// TODO : draw points (drawOval() at calculated xy pairs), connect the dots (drawLine() between calculated xy pairs)
 		
 	}
 	
