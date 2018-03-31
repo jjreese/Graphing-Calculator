@@ -132,6 +132,10 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 		int i = 0;
 		int[] countarray = new int[expression.length()];
 
+		//Fixes Parenthesis Error
+		if (expression.indexOf(')') < expression.indexOf('('))
+			throw new IllegalArgumentException("Mismatched parenthesis");
+		
 		for (i = 0; i < expression.length(); i++) {
 			if (expression.charAt(i) == '(')
 				parenCount++;
@@ -158,7 +162,7 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 				break;
 			}
 		}
-
+		
 		// String afterParen = expression.substring(leftParenIndex+1);
 		rightParenIndex = expression.indexOf(')', leftParenIndex);
 
@@ -197,7 +201,15 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 		int currentOperator = ' ';
 		int i;
 
-		//System.out.println("complexExpression is " + complexExpression);
+		System.out.println("complexExpression is " + complexExpression);
+		
+		//Fixes Missing operand issue
+		if( (complexExpression.length() - complexExpression.replace(".","").length() > 1 || complexExpression.contains(" ") ) &&  !(( complexExpression.contains("r") || complexExpression.contains("^") || complexExpression.contains("*")
+				|| complexExpression.contains("/") || complexExpression.contains("+")
+				|| complexExpression.contains("-")))) 
+			throw new IllegalArgumentException("Missing operand");
+		//
+		
 		while (complexExpression.contains("r") || complexExpression.contains("^") || complexExpression.contains("*")
 				|| complexExpression.contains("/") || complexExpression.contains("+")
 				|| complexExpression.contains("-")) {
@@ -247,6 +259,7 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 			} else if (complexExpression.contains("-")) {
 				currentOperator = complexExpression.indexOf("-");
 			}
+		
 
 			//System.out.println("index of currentOperator is " + currentOperator);
 
@@ -285,18 +298,25 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 			} else {
 				simpleExpress = complexExpression.substring(beforeOperator + 1, afterOperator);
 			}
-
+		
 			if (simpleExpress.charAt(0) == 'u') {
 				simpleExpress = '-' + simpleExpress.substring(1);
 			}
 
+					
+			//Fix of double minus issue
+			simpleExpress = simpleExpress.replace("-u","+");	
+		
 			//System.out.println("simpleExpress is " + simpleExpress);
 			simpleExpressVal = evaluateSimpleExpression(simpleExpress);
-
+			
 			if (simpleExpress.charAt(0) == '-') {
 				simpleExpress = 'u' + simpleExpress.substring(1);
 			}
 
+		
+
+			
 			//System.out.println("simpleExpressVal is " + simpleExpressVal);
 			//System.out.println("simpleExpress is " + simpleExpress);
 			//System.out.println("Complex ex is" + complexExpression);
@@ -305,9 +325,12 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 			if (complexExpression.charAt(0) == '-') {
 				complexExpression = 'u' + complexExpression.substring(1);
 			}
+			//Fix of Double Minus Issue
+			complexExpression = complexExpression.replace("-u","+");
+			
 			//System.out.println("Complex express at bottom of while is " + complexExpression);
 		}
-
+		
 		return complexExpression;
 	}
 
@@ -405,9 +428,10 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 				case '/':
 				case 'r':
 				case '^':
+				case '(':
 					break;
 				default:
-					throw new IllegalArgumentException("x has no operator next to it");
+					throw new IllegalArgumentException("x has no operator in front of it");
 				}
 			}
 			if (tempex.indexOf("x") != tempex.length() - 1) {
@@ -418,9 +442,10 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 				case '/':
 				case 'r':
 				case '^':
+				case ')':
 					break;
 				default:
-					throw new IllegalArgumentException("x has no operator next to it");
+					throw new IllegalArgumentException("x has no operator behind it");
 				}
 			//	System.out.println("Old tempex: " + tempex);
 				tempex = tempex.substring(tempex.indexOf("x") + 1, tempex.length());
@@ -587,9 +612,6 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 	}
 
 
-	
-	
-	
 	
 	
 	
