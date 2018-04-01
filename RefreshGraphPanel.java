@@ -21,7 +21,7 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 	JTextField yTextField = new JTextField();
 	Double xValueToPixelsConversionFactor =0.0;
 	Double yValueToPixelsConversionFactor =0.0;
-	String[] xTicArray = null;
+	String[] xTicArray;
 	Double[] yTicArray;
 	
 	public RefreshGraphPanel(GraphingCalculator gc,
@@ -100,8 +100,25 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 				g.drawString("--", xPixelPointer, yPixelPointer);
 			}
 		}
+				
 		
-		// TODO : draw points (drawOval() at calculated xy pairs), connect the dots (drawLine() between calculated xy pairs)
+		// fill array with pixel values for all of our xy pairs
+		int[] xDrawArray = new int[xValues.length];
+		int[] yDrawArray = new int[yValues.length];
+		
+		for(int i=0; i<xValues.length; i++) {
+			xDrawArray[i] = (Integer.parseInt(xTicArray[i]) *xValueToPixelsConversionFactor.intValue()) + 50;
+			yDrawArray[i] = ((yTicArray[i]).intValue() *yValueToPixelsConversionFactor.intValue()) + 50;
+		}
+		// for all the values we're displaying, draw an oval of width & height 20px at their calculated x and y pixel values
+		for(int i=0; i<xValues.length; i++) {
+			g.drawOval(xDrawArray[i], yDrawArray[i], 20, 20);
+		}
+		// for all ovals we generated, draw lines between them
+		for(int i=0; i<xValues.length -1; i++) {
+			g.drawLine(xDrawArray[i], yDrawArray[i], xDrawArray[i+1], yDrawArray[i+1]);
+		}
+		
 		
 	}
 	
