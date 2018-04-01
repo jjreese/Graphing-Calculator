@@ -36,7 +36,8 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		displayXYpairWindow.add(xTextField);
 		displayXYpairWindow.add(yTextField);
 		this.addMouseListener(this);
-				
+		xTicArray = new String[xValues.length];
+		yTicArray = new Double[yValues.length];
 		for(int i =0; i < xValues.length; i++) {
 			xTicArray[i] = Double.toString(xValues[i]);
 		}
@@ -71,8 +72,8 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 			// looking at values from 0 to 10
 			// we get 40 pixels for every 1 increase in X
 			
-		xValueToPixelsConversionFactor = ((windowWidth) -50 -50) / ((xValues[xValues.length] - xValues[0]));   
-		yValueToPixelsConversionFactor = ((windowHeight) -50 -50) / ((yValues[yValues.length] - yValues[0]));
+		xValueToPixelsConversionFactor = ((windowWidth) -50 -50) / ((xValues[xValues.length-1] - xValues[0]));   
+		yValueToPixelsConversionFactor = ((windowHeight) -50 -50) / ((yValues[yValues.length-1] - yValues[0]));
 			
 		// generate x-axis tic marks
 		for(int i=0; i < xValues.length; i++) {
@@ -83,7 +84,7 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 				xPixelPointer = 50;
 			}
 			else{
-				xPixelPointer += ((Integer.parseInt(xTicArray[i]) - Integer.parseInt(xTicArray[i-1])) * xValueToPixelsConversionFactor.intValue());
+				xPixelPointer += (int)((Double.parseDouble(xTicArray[i]) - Double.parseDouble(xTicArray[i-1])) * xValueToPixelsConversionFactor);
 			}
 			
 			g.drawString("|", xPixelPointer, yPixelPointer);
@@ -96,7 +97,7 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 				yPixelPointer = 50;
 			}			
 			else{
-				yPixelPointer += (((yTicArray[i]).intValue() - (yTicArray[i-1]).intValue())  * yValueToPixelsConversionFactor.intValue());
+				yPixelPointer += (int)(((yTicArray[i]) - (yTicArray[i-1]))  * yValueToPixelsConversionFactor);
 				g.drawString("--", xPixelPointer, yPixelPointer);
 			}
 		}
@@ -107,12 +108,12 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		int[] yDrawArray = new int[yValues.length];
 		
 		for(int i=0; i<xValues.length; i++) {
-			xDrawArray[i] = (Integer.parseInt(xTicArray[i]) *xValueToPixelsConversionFactor.intValue()) + 50;
-			yDrawArray[i] = ((yTicArray[i]).intValue() *yValueToPixelsConversionFactor.intValue()) + 50;
+			xDrawArray[i] = (int)(Double.parseDouble(xTicArray[i]) *xValueToPixelsConversionFactor) + 50;
+			yDrawArray[i] = (int)((yTicArray[i]) * yValueToPixelsConversionFactor) + 50;
 		}
-		// for all the values we're displaying, draw an oval of width & height 20px at their calculated x and y pixel values
+		// for all the values we're displaying, draw an oval of width & height 10px at their calculated x and y pixel values
 		for(int i=0; i<xValues.length; i++) {
-			g.drawOval(xDrawArray[i], yDrawArray[i], 20, 20);
+			g.drawOval(xDrawArray[i], yDrawArray[i], 10, 10);
 		}
 		// for all ovals we generated, draw lines between them
 		for(int i=0; i<xValues.length -1; i++) {
