@@ -418,6 +418,9 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 		} else if (!x.equals("") && !expression.contains("x"))
 			throw new IllegalArgumentException("Expression does not contain x with x value specified");
 
+		if (x.startsWith("-"))
+			x = 'u' + x.substring(1);
+		
 		// Data Validation for x //
 		String tempex = expression.replace(" ", "");
 		int numx = tempex.length() - tempex.replace("x", "").length();
