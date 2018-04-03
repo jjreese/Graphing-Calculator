@@ -627,7 +627,7 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 		RefreshGraphPanel graphPanel = new RefreshGraphPanel(this, enteredExpression, xScaleArray, yValArray, yScaleArray);
 		graphFrame.getContentPane().add(graphPanel,"Center");
 		graphFrame.setSize(500,500);
-		graphFrame.setTitle(enteredExpression);
+		graphFrame.setTitle(enteredExpression + "; click on a the graph to display the X and Y values at that point");
 		graphFrame.setLocation(500,0);
 		graphFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		graphFrame.setVisible(true);
