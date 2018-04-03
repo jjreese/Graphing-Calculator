@@ -1,7 +1,4 @@
-//Geoffrey Balshaw, Rachel Corey White, Jonathan Reese
-//edit 4/3/18
-//pre-corey edits
-
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -16,7 +13,11 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 	 * 
 	 */
 	double[] xValues;
+	double xMin;
+	double xMax;
 	double[] yValues;
+	double yMin;
+	double yMax;
 	double[] yScaleValues;
 	String expression;
 	GraphingCalculator gc;
@@ -29,9 +30,9 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 	String[] xTicArray;
 	Double[] yTicArray;
 	boolean yContains0 = false;
-	int y0Index;
+	double y0Index = 0;
 	boolean xContains0 = false;
-	int x0Index;
+	double x0Index = 0;
 	
 	public RefreshGraphPanel(GraphingCalculator gc,
 							 String expression, 
@@ -42,7 +43,7 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		this.yScaleValues = yScaleValues;
 		this.expression = expression;
 		this.gc = gc;
-		displayXYpairWindow.setSize(120, 40);
+		displayXYpairWindow.setSize(160, 40);
 		displayXYpairWindow.add(xTextField, "North");
 		displayXYpairWindow.add(yTextField, "South");
 		this.addMouseListener(this);
@@ -50,9 +51,12 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		yTicArray = new Double[yScaleValues.length];
 		for(int i =0; i < xValues.length; i++) {
 			xTicArray[i] = Double.toString(xValues[i]);
-			if(xValues[i] == 0) { 
-				xContains0 = true; 
-				x0Index = i;
+			if(xValues[i] > xMax) { xMax = xValues[i]; }
+			if(xValues[i] < xMin) { xMin = xValues[i]; }
+			
+			if(xValues[i] < 0 && xValues[i+1] <= 0) { x0Index++; }
+			else if(xValues[i] < 0 && xValues[i+1] > 0) {
+				x0Index = x0Index + Math.abs(xValues[i]) / (Math.abs(xValues[i])+xValues[i+1]);
 			}
 		}
 		
@@ -60,9 +64,12 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		// TODO : below statement is just a placeholder
 		for(int i =0; i < yScaleValues.length; i++) {
 			yTicArray[i] = (yScaleValues[i]);
-			if(yScaleValues[i] == 0) { 
-				yContains0 = true;
-				y0Index = i;
+			if(yScaleValues[i] > yMax) { yMax = yScaleValues[i]; }
+			if(yScaleValues[i] < yMin) { yMin = yScaleValues[i]; }
+			
+			if(yScaleValues[i] < 0 && yScaleValues[i+1] <= 0) { y0Index++; }
+			else if(yScaleValues[i] < 0 && yScaleValues[i+1] > 0) {
+				y0Index = y0Index + Math.abs(yScaleValues[i]) / (Math.abs(yScaleValues[i])+yScaleValues[i+1]);
 			}
 		}
 	}
@@ -93,10 +100,18 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		xValueToPixelsConversionFactor = ((windowWidth) -50 -50) / ((xValues[xValues.length-1] - xValues[0]));   
 		yValueToPixelsConversionFactor = ((windowHeight) -50 -50) / ((yScaleValues[yScaleValues.length-1] - yScaleValues[0]));
 			
-		if(yContains0) {
-			yPixelPointer = (int) (windowHeight - (y0Index * yValueToPixelsConversionFactor));
+		
+		
+		if(yMin < 0 && yMax > 0) {
+			yPixelPointer = 50 + (int) (y0Index * (((yTicArray[2]) - (yTicArray[1]))  * yValueToPixelsConversionFactor));
 		}
 		else { yPixelPointer = windowHeight - 50; }
+		//draw horizontal line
+		g.setColor(Color.green);
+		g.drawLine(((int)Double.parseDouble(xTicArray[xTicArray.length -1])*xValueToPixelsConversionFactor.intValue())+50, yPixelPointer, (int)Double.parseDouble(xTicArray[0])*xValueToPixelsConversionFactor.intValue(), yPixelPointer);
+		g.setColor(Color.black);
+		
+		//yPixelPointer = windowHeight - 50;
 		for(int i=0; i < xValues.length; i++) {
 			// add difference in xTicArray values * conversion factor to xPixelPointer
 				// ex: if each 1 gets 40 pixels, and our array is [-1, 0, 1]
@@ -109,74 +124,54 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 			}
 			
 			g.drawString("|", xPixelPointer, yPixelPointer);
+			g.drawString(xTicArray[i], xPixelPointer, yPixelPointer-20);
 		}
-		
-		if(yContains0) {
-			yPixelPointer -= 20;
-			for(int i=0; i < xValues.length; i++) {
-				// add difference in xTicArray values * conversion factor to xPixelPointer
-					// ex: if each 1 gets 40 pixels, and our array is [-1, 0, 1]
-						// xPixelPointer will start at 50, then add (0-(-1))*40 = 40px for the next index, etc.
-				if(i==0) {
-					xPixelPointer = 50;
-				}
-				else {
-					xPixelPointer += (int)((Double.parseDouble(xTicArray[i]) - Double.parseDouble(xTicArray[i-1])) * xValueToPixelsConversionFactor);
-				}
-				
-				g.drawString(xTicArray[i], xPixelPointer, yPixelPointer);
-			}
-		}
-		else {
-			yPixelPointer += 20;
-			for(int i=0; i < xValues.length; i++) {
-				// add difference in xTicArray values * conversion factor to xPixelPointer
-					// ex: if each 1 gets 40 pixels, and our array is [-1, 0, 1]
-						// xPixelPointer will start at 50, then add (0-(-1))*40 = 40px for the next index, etc.
-				if(i==0) {
-					xPixelPointer = 50;
-				}
-				else {
-					xPixelPointer += (int)((Double.parseDouble(xTicArray[i]) - Double.parseDouble(xTicArray[i-1])) * xValueToPixelsConversionFactor);
-				}
-				
-				g.drawString(xTicArray[i], xPixelPointer, yPixelPointer);
-			}
-		}
-		
 		
 		// generate y-axis tic marks
-		if(xContains0) {
-			xPixelPointer = (int) ((x0Index + 1) * xValueToPixelsConversionFactor);
+		if(xMin < 0 && xMax > 0) {
+			xPixelPointer = 50 + (int) (x0Index * ((Double.parseDouble(xTicArray[2]) - Double.parseDouble(xTicArray[1])) * xValueToPixelsConversionFactor));			
 		}
-		else { xPixelPointer = 50; }
+		else { 
+			xPixelPointer = 50;			
+		}
+		//draw vertical line
+		g.setColor(Color.green);
+		g.drawLine(xPixelPointer, yTicArray[yTicArray.length -1].intValue()*yValueToPixelsConversionFactor.intValue() +50, xPixelPointer, yTicArray[0].intValue()*yValueToPixelsConversionFactor.intValue() +50);
+		g.setColor(Color.black);
+		
+		
 		for(int i=0; i < yTicArray.length; i++) {
 			if(i==0) {
 				yPixelPointer = 50;
 			}			
-			else{
+			else {
 				yPixelPointer += (int)(((yTicArray[i]) - (yTicArray[i-1]))  * yValueToPixelsConversionFactor);
-				
 			}
-			g.drawString("--", xPixelPointer, yPixelPointer);
+				g.drawString("--", xPixelPointer-5, yPixelPointer);
+				g.drawString(yTicArray[yTicArray.length - 1 -i].toString(), xPixelPointer-30, yPixelPointer);
 		}
 		
-		xPixelPointer -=20;
-		for(int i=0; i < yTicArray.length; i++) {
-			if(i==0) {
-				yPixelPointer = 50;
-			}			
-			else{
-				yPixelPointer += (int)(((yTicArray[i]) - (yTicArray[i-1]))  * yValueToPixelsConversionFactor);
-				
-			}
-			g.drawString(yTicArray[yTicArray.length - 1 -i].toString(), xPixelPointer, yPixelPointer);
-		}
 				
 		
 		// fill array with pixel values for all of our xy pairs
 		int[] xDrawArray = new int[xValues.length];
 		int[] yDrawArray = new int[yValues.length];
+		
+		while(Double.parseDouble(xTicArray[0]) < 0) {
+			for(int i = 0; i < xTicArray.length; i++) {
+				xTicArray[i] = Double.toString(Double.parseDouble(xTicArray[i]) + 1);
+			}
+		}
+		
+		
+		for(int i = 0; i < yValues.length; i++) {
+			while(yValues[i] < 0) {
+				for(int k = 0; k < yValues.length; k++) {
+					yValues[k] = yValues[k] + 1;
+				}
+			}
+		}		
+		
 		
 		for(int i=0; i<xValues.length; i++) {
 			xDrawArray[i] = (int)(Double.parseDouble(xTicArray[i]) *xValueToPixelsConversionFactor) + 50;
@@ -184,7 +179,7 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		}
 		// for all the values we're displaying, draw an oval of width & height 10px at their calculated x and y pixel values
 		for(int i=0; i<xValues.length; i++) {
-			g.drawOval(xDrawArray[i], yDrawArray[i], 10, 10);
+			g.drawOval(xDrawArray[i]-5, yDrawArray[i]-5, 10, 10);
 		}
 		// for all ovals we generated, draw lines between them
 		for(int i=0; i<xValues.length -1; i++) {
@@ -216,29 +211,27 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 	@Override
 	public void mousePressed(MouseEvent me) {
 		// TODO Auto-generated method stub
-		// xTextField and yTextField are in the mini displayXYpairWindow
-		int windowWidth = this.getWidth();
-		int windowHeight = this.getHeight();
-		int xInPixels = me.getX();
-	    double xValue = (xInPixels - 50 + (xValues[0]*xValueToPixelsConversionFactor)) / xValueToPixelsConversionFactor;
-	    String xValueString = String.valueOf(xValue);
-	    xTextField.setText("X = " + xValueString);
-	  
-	    Double yValue;
-		try {
-			yValue = gc.calculate(expression,xValueString);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw new IllegalArgumentException(e);
-		}	    
-	    String yValueString = String.valueOf(yValue); 
-	    yTextField.setText("Y = " + yValueString);
+				// xTextField and yTextField are in the mini displayXYpairWindow
+				int windowWidth = this.getWidth();
+				int windowHeight = this.getHeight();
+				int xInPixels = me.getX();
+			    double xValue = (xInPixels - 50 + (xValues[0]*xValueToPixelsConversionFactor)) / xValueToPixelsConversionFactor;
+			    String xValueString = String.valueOf(xValue);
+			    xTextField.setText("X = " + xValueString);
+			  
+			    Double yValue;
+				try {
+					yValue = gc.calculate(expression,xValueString);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					throw new IllegalArgumentException(e);
+				}	    
+			    String yValueString = String.valueOf(yValue); 
+			    yTextField.setText("Y = " + yValueString);
 
-	    // show mini x,y display window
-	    displayXYpairWindow.setLocation(me.getX() + windowWidth + 30, me.getY());
-	    displayXYpairWindow.setVisible(true); 
-		
-		
+			    // show mini x,y display window
+			    displayXYpairWindow.setLocation(me.getX() + windowWidth + 30, me.getY());
+			    displayXYpairWindow.setVisible(true); 		
 	}
 
 	@Override

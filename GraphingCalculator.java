@@ -670,6 +670,7 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 		yRange = yMax - yMin;
 		initialIncrement = (int) yRange/yValArray.length;
 		
+		double dubIncrement=0;
 		//CORRECTION FOR INCREMENT VALUE BEING LESS THAN 1//
 		if (initialIncrement == 0)
 		{
@@ -699,11 +700,11 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 		
 		int selectedIncrement;
 		
-		int distanceToUpper = upperIncrement - initialIncrement;
-		int distanceToLower = initialIncrement - lowerIncrement;
-		if (distanceToUpper > distanceToLower)
-			selectedIncrement = lowerIncrement;
-		else
+		//int distanceToUpper = upperIncrement - initialIncrement;
+		//int distanceToLower = initialIncrement - lowerIncrement;
+		//if (distanceToUpper > distanceToLower)
+			//selectedIncrement = lowerIncrement;
+		//else
 			selectedIncrement = upperIncrement;
 		
 		
