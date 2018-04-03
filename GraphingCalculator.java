@@ -669,6 +669,21 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 		
 		yRange = yMax - yMin;
 		initialIncrement = (int) yRange/yValArray.length;
+		
+		//CORRECTION FOR INCREMENT VALUE BEING LESS THAN 1//
+		if (initialIncrement == 0)
+		{
+			dubIncrement  = yRange/yValArray.length;
+			System.out.println("DUB: " + dubIncrement);
+			for (i = 0; i < yScaleArray.length; i++)
+			{
+				yScaleArray[i] = yMin + i*dubIncrement;
+			}
+			return yScaleArray;
+		}
+		/////////////////////////////////////////////////////
+		
+		
 		String initialIncrementString = String.valueOf(initialIncrement);
 		
 		String leadingDigit = initialIncrementString.substring(0,1);
