@@ -41,9 +41,9 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		this.yScaleValues = yScaleValues;
 		this.expression = expression;
 		this.gc = gc;
-		displayXYpairWindow.setSize(200, 200);
-		displayXYpairWindow.add(xTextField);
-		displayXYpairWindow.add(yTextField);
+		displayXYpairWindow.setSize(100, 40);
+		displayXYpairWindow.add(xTextField, "North");
+		displayXYpairWindow.add(yTextField, "South");
 		this.addMouseListener(this);
 		xTicArray = new String[xValues.length];
 		yTicArray = new Double[yScaleValues.length];
@@ -110,6 +110,40 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 			g.drawString("|", xPixelPointer, yPixelPointer);
 		}
 		
+		if(yContains0) {
+			yPixelPointer -= 20;
+			for(int i=0; i < xValues.length; i++) {
+				// add difference in xTicArray values * conversion factor to xPixelPointer
+					// ex: if each 1 gets 40 pixels, and our array is [-1, 0, 1]
+						// xPixelPointer will start at 50, then add (0-(-1))*40 = 40px for the next index, etc.
+				if(i==0) {
+					xPixelPointer = 50;
+				}
+				else {
+					xPixelPointer += (int)((Double.parseDouble(xTicArray[i]) - Double.parseDouble(xTicArray[i-1])) * xValueToPixelsConversionFactor);
+				}
+				
+				g.drawString(xTicArray[i], xPixelPointer, yPixelPointer);
+			}
+		}
+		else {
+			yPixelPointer += 20;
+			for(int i=0; i < xValues.length; i++) {
+				// add difference in xTicArray values * conversion factor to xPixelPointer
+					// ex: if each 1 gets 40 pixels, and our array is [-1, 0, 1]
+						// xPixelPointer will start at 50, then add (0-(-1))*40 = 40px for the next index, etc.
+				if(i==0) {
+					xPixelPointer = 50;
+				}
+				else {
+					xPixelPointer += (int)((Double.parseDouble(xTicArray[i]) - Double.parseDouble(xTicArray[i-1])) * xValueToPixelsConversionFactor);
+				}
+				
+				g.drawString(xTicArray[i], xPixelPointer, yPixelPointer);
+			}
+		}
+		
+		
 		// generate y-axis tic marks
 		if(xContains0) {
 			xPixelPointer = (int) ((x0Index + 1) * xValueToPixelsConversionFactor);
@@ -121,8 +155,21 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 			}			
 			else{
 				yPixelPointer += (int)(((yTicArray[i]) - (yTicArray[i-1]))  * yValueToPixelsConversionFactor);
-				g.drawString("--", xPixelPointer, yPixelPointer);
+				
 			}
+			g.drawString("--", xPixelPointer, yPixelPointer);
+		}
+		
+		xPixelPointer -=20;
+		for(int i=0; i < yTicArray.length; i++) {
+			if(i==0) {
+				yPixelPointer = 50;
+			}			
+			else{
+				yPixelPointer += (int)(((yTicArray[i]) - (yTicArray[i-1]))  * yValueToPixelsConversionFactor);
+				
+			}
+			g.drawString(yTicArray[yTicArray.length - 1 -i].toString(), xPixelPointer, yPixelPointer);
 		}
 				
 		
@@ -169,7 +216,9 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 	public void mousePressed(MouseEvent me) {
 		// TODO Auto-generated method stub
 		// xTextField and yTextField are in the mini displayXYpairWindow
-	    int xInPixels = me.getX();
+		int windowWidth = this.getWidth();
+		int windowHeight = this.getHeight();
+		int xInPixels = me.getX();
 	    double xValue = xInPixels / xValueToPixelsConversionFactor;
 	    String xValueString = String.valueOf(xValue);
 	    xTextField.setText("X = " + xValueString);
@@ -185,7 +234,7 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 	    yTextField.setText("Y = " + yValueString);
 
 	    // show mini x,y display window
-	    displayXYpairWindow.setLocation(me.getX(), me.getY());
+	    displayXYpairWindow.setLocation(me.getX() + windowWidth + 30, me.getY());
 	    displayXYpairWindow.setVisible(true); 
 		
 		
