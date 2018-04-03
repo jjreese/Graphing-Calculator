@@ -604,6 +604,23 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 			catch(Exception e) {throw new IllegalArgumentException(e);}
 		}
 		
+			//CHECK FOR VALUES NOT BEING A NUMBER (SECTION T IN RUBRIC)
+		for (int i = 0; i < xScaleArray.length; i++) {
+		if(Double.isNaN(yValArray[i])) {//Not a number, shift down
+			System.out.println("I: " + i);
+			for (int j = i; j < xScaleArray.length -1; j++)
+			{
+				yValArray[j] = yValArray[j+1];
+				xScaleArray[j] = xScaleArray[j+1];
+			}
+			i--;
+			yValArray = Arrays.copyOf(yValArray,yValArray.length -1);
+			xScaleArray = Arrays.copyOf(xScaleArray, xScaleArray.length-1);
+		}
+		}
+		//
+		
+		
 	 	yScaleArray = calcYScalePrintValues(yValArray);
 	 	
 	 	System.out.println("X Vals are ");
