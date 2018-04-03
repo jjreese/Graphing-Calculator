@@ -1,3 +1,6 @@
+//Geoffrey Balshaw, Rachel Corey White, Jonathan Reese
+//edit 4/3/18
+
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -13,6 +16,7 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 	 */
 	double[] xValues;
 	double[] yValues;
+	double[] yScaleValues;
 	String expression;
 	GraphingCalculator gc;
 	private static final long serialVersionUID = 1L;
@@ -23,13 +27,18 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 	Double yValueToPixelsConversionFactor =0.0;
 	String[] xTicArray;
 	Double[] yTicArray;
+	boolean yContains0 = false;
+	int y0Index;
+	boolean xContains0 = false;
+	int x0Index;
 	
 	public RefreshGraphPanel(GraphingCalculator gc,
 							 String expression, 
 							 double[] xValues,
-							 double[] yValues) throws IllegalArgumentException {
+							 double[] yValues, double[] yScaleValues) throws IllegalArgumentException {
 		this.xValues = xValues;
 		this.yValues = yValues;
+		this.yScaleValues = yScaleValues;
 		this.expression = expression;
 		this.gc = gc;
 		displayXYpairWindow.setSize(200, 200);
@@ -37,15 +46,23 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		displayXYpairWindow.add(yTextField);
 		this.addMouseListener(this);
 		xTicArray = new String[xValues.length];
-		yTicArray = new Double[yValues.length];
+		yTicArray = new Double[yScaleValues.length];
 		for(int i =0; i < xValues.length; i++) {
 			xTicArray[i] = Double.toString(xValues[i]);
+			if(xValues[i] == 0) { 
+				xContains0 = true; 
+				x0Index = i;
+			}
 		}
 		
 		// TODO : generate algorithm for making nice neat Y values
 		// TODO : below statement is just a placeholder
-		for(int i =0; i < yValues.length; i++) {
-			yTicArray[i] = (yValues[i]);
+		for(int i =0; i < yScaleValues.length; i++) {
+			yTicArray[i] = (yScaleValues[i]);
+			if(yScaleValues[i] == 0) { 
+				yContains0 = true;
+				y0Index = i;
+			}
 		}
 	}
 	
@@ -56,8 +73,8 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		int windowHeight = this.getHeight();
 		System.out.println("Current graph size is " + windowWidth + " x " + windowHeight);
 		
-		Integer xPixelPointer = 50;
-		Integer yPixelPointer = windowHeight - 50;
+		Integer xPixelPointer = null;
+		Integer yPixelPointer = null;
 		//Now draw graph
 		
 		//int xTicSpace = ((windowWidth) -50 -50) / (xValues.length -1);
@@ -73,9 +90,12 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 			// we get 40 pixels for every 1 increase in X
 			
 		xValueToPixelsConversionFactor = ((windowWidth) -50 -50) / ((xValues[xValues.length-1] - xValues[0]));   
-		yValueToPixelsConversionFactor = ((windowHeight) -50 -50) / ((yValues[yValues.length-1] - yValues[0]));
+		yValueToPixelsConversionFactor = ((windowHeight) -50 -50) / ((yScaleValues[yScaleValues.length-1] - yScaleValues[0]));
 			
-		// generate x-axis tic marks
+		if(yContains0) {
+			yPixelPointer = (int) (windowHeight - (y0Index * yValueToPixelsConversionFactor));
+		}
+		else { yPixelPointer = windowHeight - 50; }
 		for(int i=0; i < xValues.length; i++) {
 			// add difference in xTicArray values * conversion factor to xPixelPointer
 				// ex: if each 1 gets 40 pixels, and our array is [-1, 0, 1]
@@ -83,7 +103,7 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 			if(i==0) {
 				xPixelPointer = 50;
 			}
-			else{
+			else {
 				xPixelPointer += (int)((Double.parseDouble(xTicArray[i]) - Double.parseDouble(xTicArray[i-1])) * xValueToPixelsConversionFactor);
 			}
 			
@@ -91,7 +111,10 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		}
 		
 		// generate y-axis tic marks
-		xPixelPointer =50;
+		if(xContains0) {
+			xPixelPointer = (int) ((x0Index + 1) * xValueToPixelsConversionFactor);
+		}
+		else { xPixelPointer = 50; }
 		for(int i=0; i < yTicArray.length; i++) {
 			if(i==0) {
 				yPixelPointer = 50;
@@ -109,7 +132,7 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		
 		for(int i=0; i<xValues.length; i++) {
 			xDrawArray[i] = (int)(Double.parseDouble(xTicArray[i]) *xValueToPixelsConversionFactor) + 50;
-			yDrawArray[i] = (int)((yTicArray[i]) * yValueToPixelsConversionFactor) + 50;
+			yDrawArray[i] = windowHeight - ((int)((yValues[i]) * yValueToPixelsConversionFactor) + 50);
 		}
 		// for all the values we're displaying, draw an oval of width & height 10px at their calculated x and y pixel values
 		for(int i=0; i<xValues.length; i++) {
@@ -147,7 +170,7 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		// TODO Auto-generated method stub
 		// xTextField and yTextField are in the mini displayXYpairWindow
 	    int xInPixels = me.getX();
-	    double xValue = xInPixels * xValueToPixelsConversionFactor;
+	    double xValue = xInPixels / xValueToPixelsConversionFactor;
 	    String xValueString = String.valueOf(xValue);
 	    xTextField.setText("X = " + xValueString);
 	  

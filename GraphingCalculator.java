@@ -1,5 +1,5 @@
-
 //Geoffrey Balshaw, Rachel Corey White, Jonathan Reese
+//edit 4/3/18
 
 import java.awt.Color;
 import java.awt.GridLayout;
@@ -46,6 +46,8 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 	
 	public GraphingCalculator() {
 		// TODO Auto-generated constructor stub
+		System.out.println("Jonathan Reese, Rachel Corey White, Geoffrey Balshaw");
+		
 		calcFrame.getContentPane().add(ioPanel, "Center");
 		calcFrame.getContentPane().add(northPanel, "North");
 		calcFrame.getContentPane().add(southPanel, "South");
@@ -571,48 +573,124 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 
 		}
 
-	private void Graph(String equationinput, String xinput, String xscaleinput) {
+	private void Graph(String equationInput, String xInput, String xScaleInput) {
 		// TODO Draws the graph, calculate's y values, and x scale increments
 		
-		double xValArray[] = new double[10];
-		double yValArray[] = new double[10];
-		double yScaleArray[] = new double[10];
-		double xValue, xscalevalue;
-		try {xValue = Double.parseDouble(xinput); xscalevalue = Double.parseDouble(xscaleinput);} 
-		catch(Exception ile) {throw new IllegalArgumentException("No valid x/x scale value");}
+		double xValue;
+		double xScaleValue;
+				
+		double xScaleArray[] = new double[10];		
 		
-		//Set Parameters//
-		for (int i = 0; i < 10; i++) //10 Values of arrays, give us the values to graph
-		{
-			xValArray[i] = xValue + (i*xscalevalue);
-			try {
-			yValArray[i] = calculate(equationinput,Double.toString(xValArray[i]));
-			}
+		try {xValue = Double.parseDouble(xInput); xScaleValue = Double.parseDouble(xScaleInput);} 
+		catch(Exception ile) {throw new IllegalArgumentException("No valid x and/or x scale value");}
+		
+		for (int i = 0; i < 10; i++) {
+			xScaleArray[i] = xValue + (i*xScaleValue);
+		}
+		
+		if((xScaleArray[9] > 0) && (xScaleArray[0] < 0)) {
+			xScaleArray = Arrays.copyOf(xScaleArray, xScaleArray.length+1);
+			xScaleArray[10] = xValue + (10*xScaleValue);
+		}
+		
+		double yValArray[] = new double[xScaleArray.length];
+		double yScaleArray[] = new double[xScaleArray.length];
+		
+		for (int i = 0; i < xScaleArray.length; i++) {
+			try { yValArray[i] = calculate(equationInput,Double.toString(xScaleArray[i])); }
 			catch(Exception e) {throw new IllegalArgumentException(e);}
 		}
-		//Need yscalearray values here -> calcYscalePrintValues() See online notes
 		
-	 	//yScaleArray = calcYScalePrintValues(yValArray);
-		
-		//xscalearray = xvalarray just pass the same value twice
-		
-		//Need to pop a new graph window here -> drawGraph()
+	 	yScaleArray = calcYScalePrintValues(yValArray);
+	 	
+	 	System.out.println("X Vals are ");
+	 	for(int i=0; i<xScaleArray.length; i++) {
+	 		System.out.println(xScaleArray[i]);
+	 		System.out.println(" ");
+	 	}
+	 	System.out.println("Y Vals are ");
+	 	for(int i=0; i<yValArray.length; i++) {
+	 		System.out.println(yValArray[i]);
+	 		System.out.println(" ");
+	 	}
+	 	System.out.println("Y Scale Vals are ");
+	 	for(int i=0; i<yScaleArray.length; i++) {
+	 		System.out.println(yScaleArray[i]);
+	 		System.out.println(" ");
+	 	}
+				
+		//Graph
 		JFrame graphFrame = new JFrame();
-		RefreshGraphPanel graphPanel = new RefreshGraphPanel(this, enteredExpression, xValArray, yValArray);
+		RefreshGraphPanel graphPanel = new RefreshGraphPanel(this, enteredExpression, xScaleArray, yValArray, yScaleArray);
 		graphFrame.getContentPane().add(graphPanel,"Center");
 		graphFrame.setSize(500,500);
 		graphFrame.setTitle(enteredExpression);
 		graphFrame.setLocation(500,0);
 		graphFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		
-		
 		graphFrame.setVisible(true);
-
-		
 	}
 
 
-	
+	private double[] calcYScalePrintValues(double yValArray[]) {
+		double yScaleArray[] = new double[yValArray.length];
+		
+		double yMin = yValArray[0];
+		double yMax = yValArray[0];
+		double yRange;
+		int initialIncrement;
+		
+		int i;
+		String zeros = "0000000000";
+		
+		for(i=0; i < yValArray.length; i++) {
+			if(yValArray[i] > yMax) { yMax = yValArray[i]; }
+			if(yValArray[i] < yMin) { yMin = yValArray[i]; }
+ 		}
+		
+		yRange = yMax - yMin;
+		initialIncrement = (int) yRange/yValArray.length;
+		String initialIncrementString = String.valueOf(initialIncrement);
+		
+		String leadingDigit = initialIncrementString.substring(0,1);
+		int leadingNumber = Integer.parseInt(leadingDigit);
+		int bumpedLeadingNumber = leadingNumber + 1;
+		String bumpedLeadingDigit = String.valueOf(bumpedLeadingNumber);
+		String upperIncrementString = bumpedLeadingDigit + zeros.substring(0,initialIncrementString.length()-1);
+		String lowerIncrementString = leadingDigit       + zeros.substring(0,initialIncrementString.length()-1);
+		int upperIncrement = Integer.parseInt(upperIncrementString);
+		int lowerIncrement = Integer.parseInt(lowerIncrementString);
+		System.out.println("Upper increment alternative = " + upperIncrement);
+		System.out.println("Lower increment alternative = " + lowerIncrement);
+		
+		int selectedIncrement;
+		
+		int distanceToUpper = upperIncrement - initialIncrement;
+		int distanceToLower = initialIncrement - lowerIncrement;
+		if (distanceToUpper > distanceToLower)
+			selectedIncrement = lowerIncrement;
+		else
+			selectedIncrement = upperIncrement;
+		
+		
+		int numberOfYscaleValues = 0;
+		int lowestYscaleValue    = 0;
+		if (yMin < 0) {
+		     for (; lowestYscaleValue > yMin; lowestYscaleValue-=selectedIncrement)
+		          numberOfYscaleValues++;
+		}
+		if (yMin > 0) {
+			 for (; lowestYscaleValue < yMin; lowestYscaleValue+=selectedIncrement)
+			      numberOfYscaleValues++;
+		     numberOfYscaleValues--;
+		     lowestYscaleValue -= selectedIncrement;
+		}
+		
+		for(i=0; i<yValArray.length;i++) {
+			yScaleArray[i] = lowestYscaleValue + selectedIncrement*i;
+		}
+		
+		return yScaleArray;
+	}
 	
 	
 	@Override
