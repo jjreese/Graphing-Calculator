@@ -1,5 +1,6 @@
 //Geoffrey Balshaw, Rachel Corey White, Jonathan Reese
 //edit 4/3/18
+//pre-corey edits
 
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
@@ -41,7 +42,7 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		this.yScaleValues = yScaleValues;
 		this.expression = expression;
 		this.gc = gc;
-		displayXYpairWindow.setSize(100, 40);
+		displayXYpairWindow.setSize(120, 40);
 		displayXYpairWindow.add(xTextField, "North");
 		displayXYpairWindow.add(yTextField, "South");
 		this.addMouseListener(this);
@@ -219,7 +220,7 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		int windowWidth = this.getWidth();
 		int windowHeight = this.getHeight();
 		int xInPixels = me.getX();
-	    double xValue = xInPixels / xValueToPixelsConversionFactor;
+	    double xValue = (xInPixels - 50 + (xValues[0]*xValueToPixelsConversionFactor)) / xValueToPixelsConversionFactor;
 	    String xValueString = String.valueOf(xValue);
 	    xTextField.setText("X = " + xValueString);
 	  
