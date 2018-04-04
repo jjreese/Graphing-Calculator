@@ -104,7 +104,19 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		
 		
 		if(yMin < 0 && yMax > 0) {
-			yPixelPointer = 50 + (int) (y0Index * (((yTicArray[2]) - (yTicArray[1]))  * yValueToPixelsConversionFactor));
+			for(int i=0; i<yScaleValues.length; i++) {
+				if(i==0) {
+					yPixelPointer=50;
+				}
+				else {
+					yPixelPointer += (int)(((yTicArray[i]) - (yTicArray[i-1]))  * yValueToPixelsConversionFactor);
+				}
+				if(yTicArray[yTicArray.length - 1 -i] == 0) {
+					break;
+				}
+			}
+			//yPixelPointer = 50 + (int) (y0Index * yValueToPixelsConversionFactor); //* (((yTicArray[2]) - (yTicArray[1]))
+			
 		}
 		else { yPixelPointer = windowHeight - 50; }
 		//draw horizontal line
@@ -143,6 +155,11 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 			else {
 				yPixelPointer += (int)(((yTicArray[i]) - (yTicArray[i-1]))  * yValueToPixelsConversionFactor);
 			}
+			for(int k = 0; k < yTicArray.length; k++) {
+				if (yTicArray[k] % 1 != 0) {
+					yTicArray[k] = (double) (Math.round(yTicArray[k]*100))/100;
+				}
+			}
 				g.drawString("--", xPixelPointer, yPixelPointer);
 				g.drawString(yTicArray[yTicArray.length - 1 -i].toString(), xPixelPointer-30, yPixelPointer);
 		}
@@ -174,8 +191,10 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 	 	System.out.println("windowHeight is " + windowHeight);
 	 	System.out.println("yValueToPixelConversion factor is " + yValueToPixelsConversionFactor);
 		
-		for(int i=0; i<xValues.length; i++) {
-			xDrawArray[i] = (int)(Double.parseDouble(xTicArray[i]) *xValueToPixelsConversionFactor) + 50;
+	 	for(int i=0; i<xValues.length; i++) {
+			if(xValues[0] > 0) { xDrawArray[i] = (int)((Double.parseDouble(xTicArray[i]) * xValueToPixelsConversionFactor) + 50 - (xValueToPixelsConversionFactor*(Double.parseDouble(xTicArray[0])))); }
+			if(xValues[xValues.length-1] < 0) { xDrawArray[i] = (int)((Double.parseDouble(xTicArray[i]) * xValueToPixelsConversionFactor) + 50 + (xValueToPixelsConversionFactor*(-1*Double.parseDouble(xTicArray[xValues.length-1])))); }
+			else { xDrawArray[i] = (int)(Double.parseDouble(xTicArray[i]) * xValueToPixelsConversionFactor) + 50; }
 			yDrawArray[i] = windowHeight - (int) (((yValues[i]) * yValueToPixelsConversionFactor) + 50);
 		}
 		// for all the values we're displaying, draw an oval of width & height 10px at their calculated x and y pixel values
