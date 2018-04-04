@@ -337,7 +337,7 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 
 	private String evaluateSimpleExpression(String simpleExpression) throws Exception {
 		// TODO Handles 1 operator remaining
-		// simpleExpression = simpleExpression.replaceAll("u", "-");
+		simpleExpression = simpleExpression.replaceAll("u", "-");
 		//System.out.println("simpleExpression is " + simpleExpression);
 		char operator = ' ';
 		int i;
