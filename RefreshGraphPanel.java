@@ -44,9 +44,9 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		this.yScaleValues = yScaleValues;
 		this.expression = expression;
 		this.gc = gc;
-		displayXYpairWindow.setSize(200, 200);
-		displayXYpairWindow.add(xTextField);
-		displayXYpairWindow.add(yTextField);
+		displayXYpairWindow.setSize(150, 40);
+		displayXYpairWindow.add(xTextField, "North");
+		displayXYpairWindow.add(yTextField, "South");
 		this.addMouseListener(this);
 		xTicArray = new String[xValues.length];
 		yTicArray = new Double[yScaleValues.length];
@@ -180,7 +180,7 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		}
 		// for all the values we're displaying, draw an oval of width & height 10px at their calculated x and y pixel values
 		for(int i=0; i<xValues.length; i++) {
-			g.drawOval(xDrawArray[i], yDrawArray[i], 10, 10);
+			g.drawOval(xDrawArray[i]-5, yDrawArray[i]-5, 10, 10);
 		}
 		// for all ovals we generated, draw lines between them
 		for(int i=0; i<xValues.length - 1; i++) {
