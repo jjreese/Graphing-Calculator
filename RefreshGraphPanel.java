@@ -1,5 +1,6 @@
-import java.awt.Color;
 import java.awt.Graphics;
+
+import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -43,9 +44,9 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		this.yScaleValues = yScaleValues;
 		this.expression = expression;
 		this.gc = gc;
-		displayXYpairWindow.setSize(160, 40);
-		displayXYpairWindow.add(xTextField, "North");
-		displayXYpairWindow.add(yTextField, "South");
+		displayXYpairWindow.setSize(200, 200);
+		displayXYpairWindow.add(xTextField);
+		displayXYpairWindow.add(yTextField);
 		this.addMouseListener(this);
 		xTicArray = new String[xValues.length];
 		yTicArray = new Double[yScaleValues.length];
@@ -108,10 +109,8 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		else { yPixelPointer = windowHeight - 50; }
 		//draw horizontal line
 		g.setColor(Color.green);
-		g.drawLine(((int)Double.parseDouble(xTicArray[xTicArray.length -1])*xValueToPixelsConversionFactor.intValue())+50, yPixelPointer, (int)Double.parseDouble(xTicArray[0])*xValueToPixelsConversionFactor.intValue(), yPixelPointer);
+		g.drawLine(0, yPixelPointer, windowHeight, yPixelPointer);
 		g.setColor(Color.black);
-		
-		//yPixelPointer = windowHeight - 50;
 		for(int i=0; i < xValues.length; i++) {
 			// add difference in xTicArray values * conversion factor to xPixelPointer
 				// ex: if each 1 gets 40 pixels, and our array is [-1, 0, 1]
@@ -129,16 +128,13 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 		
 		// generate y-axis tic marks
 		if(xMin < 0 && xMax > 0) {
-			xPixelPointer = 50 + (int) (x0Index * ((Double.parseDouble(xTicArray[2]) - Double.parseDouble(xTicArray[1])) * xValueToPixelsConversionFactor));			
+			xPixelPointer = 50 + (int) (x0Index * ((Double.parseDouble(xTicArray[2]) - Double.parseDouble(xTicArray[1])) * xValueToPixelsConversionFactor));
 		}
-		else { 
-			xPixelPointer = 50;			
-		}
-		//draw vertical line
-		g.setColor(Color.green);
-		g.drawLine(xPixelPointer, yTicArray[yTicArray.length -1].intValue()*yValueToPixelsConversionFactor.intValue() +50, xPixelPointer, yTicArray[0].intValue()*yValueToPixelsConversionFactor.intValue() +50);
-		g.setColor(Color.black);
+		else { xPixelPointer = 50; }
 		
+		g.setColor(Color.green);
+		g.drawLine(xPixelPointer, 0, xPixelPointer, windowWidth);
+		g.setColor(Color.black);
 		
 		for(int i=0; i < yTicArray.length; i++) {
 			if(i==0) {
@@ -147,10 +143,9 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 			else {
 				yPixelPointer += (int)(((yTicArray[i]) - (yTicArray[i-1]))  * yValueToPixelsConversionFactor);
 			}
-				g.drawString("--", xPixelPointer-5, yPixelPointer);
+				g.drawString("--", xPixelPointer, yPixelPointer);
 				g.drawString(yTicArray[yTicArray.length - 1 -i].toString(), xPixelPointer-30, yPixelPointer);
 		}
-		
 				
 		
 		// fill array with pixel values for all of our xy pairs
@@ -172,17 +167,23 @@ public class RefreshGraphPanel extends JPanel implements MouseListener{
 			}
 		}		
 		
+		System.out.println("Y Values shifted to positive are: ");		
+	 	for(int i=0; i<yValues.length; i++) {
+	 		System.out.println(yValues[i]);
+	 	}
+	 	System.out.println("windowHeight is " + windowHeight);
+	 	System.out.println("yValueToPixelConversion factor is " + yValueToPixelsConversionFactor);
 		
 		for(int i=0; i<xValues.length; i++) {
 			xDrawArray[i] = (int)(Double.parseDouble(xTicArray[i]) *xValueToPixelsConversionFactor) + 50;
-			yDrawArray[i] = windowHeight - ((int)((yValues[i]) * yValueToPixelsConversionFactor) + 50);
+			yDrawArray[i] = windowHeight - (int) (((yValues[i]) * yValueToPixelsConversionFactor) + 50);
 		}
 		// for all the values we're displaying, draw an oval of width & height 10px at their calculated x and y pixel values
 		for(int i=0; i<xValues.length; i++) {
-			g.drawOval(xDrawArray[i]-5, yDrawArray[i]-5, 10, 10);
+			g.drawOval(xDrawArray[i], yDrawArray[i], 10, 10);
 		}
 		// for all ovals we generated, draw lines between them
-		for(int i=0; i<xValues.length -1; i++) {
+		for(int i=0; i<xValues.length - 1; i++) {
 			g.drawLine(xDrawArray[i], yDrawArray[i], xDrawArray[i+1], yDrawArray[i+1]);
 		}
 		

@@ -1,5 +1,4 @@
 //Geoffrey Balshaw, Rachel Corey White, Jonathan Reese
-//edit 4/3/18
 
 import java.awt.Color;
 import java.awt.GridLayout;
@@ -338,7 +337,7 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 
 	private String evaluateSimpleExpression(String simpleExpression) throws Exception {
 		// TODO Handles 1 operator remaining
-		simpleExpression = simpleExpression.replaceAll("u", "-");
+		// simpleExpression = simpleExpression.replaceAll("u", "-");
 		//System.out.println("simpleExpression is " + simpleExpression);
 		char operator = ' ';
 		int i;
@@ -604,7 +603,7 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 			catch(Exception e) {throw new IllegalArgumentException(e);}
 		}
 		
-			//CHECK FOR VALUES NOT BEING A NUMBER (SECTION T IN RUBRIC)
+		//CHECK FOR VALUES NOT BEING A NUMBER (SECTION T IN RUBRIC)
 		for (int i = 0; i < xScaleArray.length; i++) {
 		if(Double.isNaN(yValArray[i])) {//Not a number, shift down
 			System.out.println("I: " + i);
@@ -616,10 +615,9 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 			i--;
 			yValArray = Arrays.copyOf(yValArray,yValArray.length -1);
 			xScaleArray = Arrays.copyOf(xScaleArray, xScaleArray.length-1);
+			}
 		}
-		}
-		//
-		
+				//
 		
 	 	yScaleArray = calcYScalePrintValues(yValArray);
 	 	
@@ -644,7 +642,7 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 		RefreshGraphPanel graphPanel = new RefreshGraphPanel(this, enteredExpression, xScaleArray, yValArray, yScaleArray);
 		graphFrame.getContentPane().add(graphPanel,"Center");
 		graphFrame.setSize(500,500);
-		graphFrame.setTitle(enteredExpression + "; click on a the graph to display the X and Y values at that point");
+		graphFrame.setTitle(enteredExpression);
 		graphFrame.setLocation(500,0);
 		graphFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		graphFrame.setVisible(true);
@@ -705,7 +703,7 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 		//if (distanceToUpper > distanceToLower)
 			//selectedIncrement = lowerIncrement;
 		//else
-			selectedIncrement = upperIncrement;
+		selectedIncrement = upperIncrement;
 		
 		
 		int numberOfYscaleValues = 0;
@@ -724,6 +722,25 @@ public class GraphingCalculator implements Calculator, KeyListener, ActionListen
 		for(i=0; i<yValArray.length;i++) {
 			yScaleArray[i] = lowestYscaleValue + selectedIncrement*i;
 		}
+		
+		if(!((yScaleArray[0] < 0) && (yScaleArray[(yScaleArray.length)-1] > 0))) {
+			//does not include zero
+			if((yScaleArray[0] > 0) && (yScaleArray[(yScaleArray.length)-1]/selectedIncrement <= 3) ) {
+				System.out.println("Lower y scale can be adjusted to include the 0 point");
+				yScaleArray[0] = 0;	
+			}
+			if((yScaleArray[yScaleArray.length-1] <0) && (yScaleArray[yScaleArray.length-1]/selectedIncrement <= 3)) {
+				System.out.println("Upper y scale can be adjusted to include the 0 point");
+				yScaleArray[yScaleArray.length-1] = 0;
+			}
+		}
+		
+		int yScaleValue = (int) yScaleArray[0];
+		while(yScaleValue < yScaleArray[yScaleArray.length-1]) {
+			System.out.println(yScaleValue + ",");
+			yScaleValue += selectedIncrement;
+		}
+		System.out.println(yScaleValue);
 		
 		return yScaleArray;
 	}
